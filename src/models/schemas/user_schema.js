@@ -1,50 +1,40 @@
-let entityConfig = {
+/**
+ * Mapeamento da entidade de usuários.
+ */
+const validate = require('../../api/services/validate_service');
+
+exports.entityConfig = {
     entityName: 'users',
     fields: [
         {
             fieldName: 'name',
             fieldType: 'str',
             validateFunctions: [
-                'required',
+                validate.REQUIRED,
             ],
         },
         {
             fieldName: 'email',
             fieldType: 'str',
             validateFunctions: [
-                'required',
-                'email_valid',
-                'unique',
+                validate.REQUIRED,
+                validate.EMAIL_VALID,
+                validate.UNIQUE,
             ],
         },
         {
             fieldName: 'password',
             fieldType: 'str',
             validateFunctions: [
-                'required',
+                validate.REQUIRED,
             ],
         },
         {
             fieldName: 'role',
             fieldType: 'str',
             validateFunctions: [
-                'required',
+                validate.REQUIRED,
             ],
         },
-    ]
-}
-
-module.exports = {
-    insert() {
-      console.log('inserindo no mongodb');
-    },
-    update() {
-        console.log('Atualizando no mongodb');
-    },
-    list() {
-        console.log('Listando no mongodb');
-    },
-    get() {
-        console.log('Realizando get no mongodb');
-    }
+    ],
 };
