@@ -1,43 +1,87 @@
-const crud = require('../api/services/crud_service');
-const validate = require('../api/services/validate_service');
-const model = require('../models/user');
+const CrudController = require('./crud_scontroller');
+const ValidateService = require('../api/services/validate_service');
+const UserModel = require('../models/user');
 
-export function insert(request) {
-    const isValid = validate.checkModel(model, request);
-    if (isValid) {
-        const values = request;
-        crud.insert(model, values);
+const model = new UserModel();
+
+class UserController extends CrudController {
+    constructor(request) {
+        super(model);
+        this.request = request.query;
+        this.message = '';
+        this.status = 200;
+        this.validate = new ValidateService(this.model, this.request);
+    }
+
+    insert() {
+        const validateResult = this.validate.checkModel(this.request.query);
+        if (!validateResult.valid) {
+            this.message = validateResult.message;
+            this.status = validateResult.status;
+            return false;
+        }
+
+        const values = this.request;
+        const result = super.insert(values);
+        if (result.ok && result.insertedCount === 1) {
+            this.message = `
+                ${this.model.entityName} com ID=${result.insertedId} foi inserido com sucesso.`;
+            return true;
+        }
+    }
+
+    update() {
+        const validateResult = this.validate.checkModel();
+        if (!validateResult.valid) {
+            this.message = validateResult.message;
+            this.status = validateResult.status;
+            return false;
+        }
+
+        const values = this.request;
+        const result = super.update(values);
+        if (result.ok && result.updatedCount === 1) {
+            this.message = `
+                ${this.model.entityName} com ID=${result.insertedId} foi atualizado com sucesso.`;
+            return true;
+        }
+    }
+
+    list() {
+        const validateResult = this.validate.checkModel(this.request.query);
+        if (!validateResult.valid) {
+            this.message = validateResult.message;
+            this.status = validateResult.status;
+            return false;
+        }
+
+        const query = this.request;
+        super.list(query);
+    }
+
+    get() {
+        const validateResult = this.validate.checkModel(this.request.query);
+        if (!validateResult.valid) {
+            this.message = validateResult.message;
+            this.status = validateResult.status;
+            return false;
+        }
+
+        const query = this.request;
+        super.get(query);
+    }
+
+    remove() {
+        const validateResult = this.validate.checkModel(this.request.query);
+        if (!validateResult.valid) {
+            this.message = validateResult.message;
+            this.status = validateResult.status;
+            return false;
+        }
+
+        const query = this.request;
+        super.remove(query);
     }
 }
 
-export function update(request) {
-    const isValid = validate.checkModel(model, request);
-    if (isValid) {
-        const values = request;
-        crud.update(model, values);
-    }
-}
-
-export function list(request) {
-    const isValid = validate.checkModel(model, request);
-    if (isValid) {
-        const query = request;
-        crud.list(model, query);
-    }
-}
-
-export function get(request) {
-    const isValid = validate.checkModel(model, request);
-    if (isValid) {
-        const query = request;
-        crud.get(model, query);
-    }
-}
-
-export function remove(request) {
-    const isValid = validate.checkModel(model, request);
-    if (isValid) {
-        const query = request;
-        crud.remove(model, query);
-    }
-}
+module.exports = UserController;

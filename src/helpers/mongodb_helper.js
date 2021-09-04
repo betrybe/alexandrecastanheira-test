@@ -1,73 +1,86 @@
 /**
  * Helper responsável por manipular o mongodb
  */
-import { MongoClient } from 'mongodb';
+// import { MongoClient } from 'mongodb';
+const mongo = require('mongodb');
+
+const { MongoClient } = mongo;
 
 const MONGO_DB_URL = 'mongodb://localhost:27017/Cookmaster';
 const DB_NAME = 'Cookmaster';
-
 // const MONGO_DB_URL = 'mongodb://mongodb:27017/Cookmaster';
 // const DB_NAME = 'Cookmaster';
 
-export function insert(collection, data) {
-    console.log('inserindo no mongodb');
-    MongoClient.connect(MONGO_DB_URL, (err, db) => {
-        if (err) throw err;
-        const dbo = db.db(DB_NAME);
-        dbo.collection(collection).insertOne(data, (error, res) => {
-            if (error) throw error;
-            console.log('1 document inserted');
-            db.close();
-        });
-    });
-}
-export function update(collection, data, query) {
-    console.log('Atualizando no mongodb');
-    MongoClient.connect(MONGO_DB_URL, (err, db) => {
-        if (err) throw err;
-        const dbo = db.db(DB_NAME);
+class MongoDB {
+    construct(collection) {
+        this.collection = collection;
+    }
 
-        dbo.collection(collection).updateOne(query, data, (error, res) => {
-            if (error) throw error;
-            console.log('1 document updated');
-            db.close();
+    insert(data) {
+        console.log('inserindo no mongodb');
+        MongoClient.connect(MONGO_DB_URL, (err, db) => {
+            if (err) throw err;
+            const dbo = db.db(DB_NAME);
+            dbo.collection(this.collection).insertOne(data, (error, _res) => {
+                if (error) throw error;
+                console.log('1 document inserted');
+                db.close();
+            });
         });
-    });
-}
-export function list(collection, query) {
-    console.log('Listando no mongodb');
-    MongoClient.connect(MONGO_DB_URL, (err, db) => {
-        if (err) throw err;
-        const dbo = db.db(DB_NAME);
-        dbo.collection(collection).find(query).toArray((error, res) => {
-            if (error) throw error;
-            console.log(res);
-            db.close();
+    };
+
+    update(data, query) {
+        console.log('Atualizando no mongodb');
+        MongoClient.connect(MONGO_DB_URL, (err, db) => {
+            if (err) throw err;
+            const dbo = db.db(DB_NAME);
+
+            dbo.collection(this.collection).updateOne(query, data, (error, _res) => {
+                if (error) throw error;
+                console.log('1 document updated');
+                db.close();
+            });
         });
-    });
-}
-export function get(collection, query) {
-    console.log('Realizando get no mongodb');
-    MongoClient.connect(MONGO_DB_URL, (err, db) => {
-        if (err) throw err;
-        const dbo = db.db(DB_NAME);
-        dbo.collection(collection).findOne(query, (error, res) => {
-            if (error) throw error;
-            console.log(res.name);
-            db.close();
+    };
+
+    list(query) {
+        console.log('Listando no mongodb');
+        MongoClient.connect(MONGO_DB_URL, (err, db) => {
+            if (err) throw err;
+            const dbo = db.db(DB_NAME);
+            dbo.collection(this.collection).find(query).toArray((error, res) => {
+                if (error) throw error;
+                console.log(res);
+                db.close();
+            });
         });
-    });
+    };
+
+    get(query) {
+        console.log('Realizando get no mongodb');
+        MongoClient.connect(MONGO_DB_URL, (err, db) => {
+            if (err) throw err;
+            const dbo = db.db(DB_NAME);
+            dbo.collection(this.collection).findOne(query, (error, res) => {
+                if (error) throw error;
+                console.log(res.name);
+                db.close();
+            });
+        });
+    };
+
+    remove(query) {
+        console.log('Realizando delete no mongodb');
+        MongoClient.connect(MONGO_DB_URL, (err, db) => {
+            if (err) throw err;
+            const dbo = db.db(DB_NAME);
+            dbo.collection(this.collection).deleteOne(query, (error, _res) => {
+                if (error) throw error;
+                console.log('1 document deleted');
+                db.close();
+            });
+        });
+    };
 }
 
-export function remove(collection, query) {
-    console.log('Realizando delete no mongodb');
-    MongoClient.connect(MONGO_DB_URL, (err, db) => {
-        if (err) throw err;
-        const dbo = db.db(DB_NAME);
-        dbo.collection(collection).deleteOne(query, (error, res) => {
-            if (error) throw error;
-            console.log('1 document deleted');
-            db.close();
-        });
-    });
-}
+module.exports = MongoDB;
