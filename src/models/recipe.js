@@ -25,13 +25,13 @@ const fields = [
     },
 ]
 
- class Recipe extends Model {
-     constructor() {
-         super();
-         this.entityName = 'recipes';
-         this.database = new MongoDB(this.entityName);
-         this.fields = fields;
-     }
- }
+class Recipe extends Model {
+    constructor() {
+        super();
+        this.entityName = 'recipes';
+        this.setDatabase(new MongoDB(this.entityName));
+        this.fields = fields;
+    }
+}
 
  module.exports = Recipe;

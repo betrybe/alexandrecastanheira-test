@@ -38,7 +38,7 @@ class User extends Model {
     constructor() {
         super();
         this.entityName = 'users';
-        this.database = new MongoDB(this.entityName);
+        this.setDatabase(new MongoDB(this.entityName));
         this.fields = fields;
     }
 }

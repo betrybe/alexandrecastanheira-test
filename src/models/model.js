@@ -12,34 +12,40 @@ class Model {
         this.database = database;
     }
 
-    insert(values) {
+    async insert(values) {
         const msg = `Realizando insert da entidade: ${this.entityName}`;
         console.log(msg);
-        return this.database.insert(this.entityName, values);
+        return this.database.insert(values);
     }
 
-    update(values, query) {
+    async update(values, query) {
         const msg = `Realizando update na entidade: ${this.entityName}`;
         console.log(msg);
-        return this.database.update(this.entityName, values, query);
+        return this.database.update(values, query);
     }
 
-    list(query) {
+    async list(query) {
         const msg = `Realizando list na entidade: ${this.entityName}`;
         console.log(msg);
-        return this.database.list(this.entityName, query);
+        return this.database.list(query);
     }
 
-    get(query) {
+    count(query) {
+        const msg = `Realizando count na entidade: ${this.entityName}`;
+        console.log(msg);
+        return this.database.count(query);
+    }
+
+    async get(query) {
         const msg = `Realizando get na entidade: ${this.entityName}`;
         console.log(msg);
-        return this.database.get(this.entityName, query);
+        return this.database.get(query);
     }
 
-    remove(query) {
+    async remove(query) {
         const msg = `Realizando delete na entidade: ${this.entityName}`;
         console.log(msg);
-        return this.database.remove(this.entityName, query);
+        return this.database.remove(query);
     }
 }
 

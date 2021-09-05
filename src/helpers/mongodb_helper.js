@@ -2,9 +2,8 @@
  * Helper responsável por manipular o mongodb
  */
 // import { MongoClient } from 'mongodb';
-const mongo = require('mongodb');
-
-const { MongoClient } = mongo;
+const { MongoClient } = require('mongodb');
+const ObjectId = require('mongodb').ObjectID;
 
 const MONGO_DB_URL = 'mongodb://localhost:27017/Cookmaster';
 const DB_NAME = 'Cookmaster';
@@ -12,75 +11,117 @@ const DB_NAME = 'Cookmaster';
 // const DB_NAME = 'Cookmaster';
 
 class MongoDB {
-    construct(collection) {
+    constructor(collection) {
         this.collection = collection;
     }
 
-    insert(data) {
-        console.log('inserindo no mongodb');
-        MongoClient.connect(MONGO_DB_URL, (err, db) => {
-            if (err) throw err;
-            const dbo = db.db(DB_NAME);
-            dbo.collection(this.collection).insertOne(data, (error, _res) => {
-                if (error) throw error;
-                console.log('1 document inserted');
-                db.close();
-            });
-        });
-    };
+    async insert(data) {
+        const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
+        try {
+            await client.connect();
+            const database = client.db(DB_NAME);
+            const collection = database.collection(this.collection);
+            // create a document to be inserted
 
-    update(data, query) {
-        console.log('Atualizando no mongodb');
-        MongoClient.connect(MONGO_DB_URL, (err, db) => {
-            if (err) throw err;
-            const dbo = db.db(DB_NAME);
+            const result = await collection.insertOne(data);
+            console.log(
+                `${result.insertedCount} documento inserido com o _id: ${result.insertedId}`,
+            );
+        } finally {
+            await client.close();
+        }
+    }
 
-            dbo.collection(this.collection).updateOne(query, data, (error, _res) => {
-                if (error) throw error;
-                console.log('1 document updated');
-                db.close();
-            });
-        });
-    };
+    async update(data, query) {
+        const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
+        let result = '';
+        try {
+            await client.connect();
+            const database = client.db(DB_NAME);
+            const collection = database.collection(this.collection);
+            const setValues = {
+                $set: data,
+            };
 
-    list(query) {
-        console.log('Listando no mongodb');
-        MongoClient.connect(MONGO_DB_URL, (err, db) => {
-            if (err) throw err;
-            const dbo = db.db(DB_NAME);
-            dbo.collection(this.collection).find(query).toArray((error, res) => {
-                if (error) throw error;
-                console.log(res);
-                db.close();
-            });
-        });
-    };
+            const query2 = {
+                _id: new ObjectId(query.id),
+            };
 
-    get(query) {
-        console.log('Realizando get no mongodb');
-        MongoClient.connect(MONGO_DB_URL, (err, db) => {
-            if (err) throw err;
-            const dbo = db.db(DB_NAME);
-            dbo.collection(this.collection).findOne(query, (error, res) => {
-                if (error) throw error;
-                console.log(res.name);
-                db.close();
-            });
-        });
-    };
+            result = await collection.updateOne(query2, setValues);
+        } finally {
+            await client.close();
+        }
 
-    remove(query) {
-        console.log('Realizando delete no mongodb');
-        MongoClient.connect(MONGO_DB_URL, (err, db) => {
-            if (err) throw err;
-            const dbo = db.db(DB_NAME);
-            dbo.collection(this.collection).deleteOne(query, (error, _res) => {
-                if (error) throw error;
-                console.log('1 document deleted');
-                db.close();
-            });
-        });
-    };
+        return result;
+    }
+
+    async count(query) {
+        const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
+        let result = '';
+        try {
+            await client.connect();
+            const database = client.db(DB_NAME);
+            const collection = database.collection(this.collection);
+            result = await collection.countDocuments(query);
+        } finally {
+            await client.close();
+        }
+
+        return result;
+    }
+
+    async list(query) {
+        const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
+        let result = '';
+        try {
+            await client.connect();
+            const database = client.db(DB_NAME);
+            const collection = database.collection(this.collection);
+            result = await collection.find(query).toArray();
+        } finally {
+            await client.close();
+        }
+
+        return result;
+    }
+
+    async get(query) {
+        const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
+        let result = '';
+
+        await client.connect();
+        const database = client.db(DB_NAME);
+        const collection = database.collection(this.collection);
+        const query2 = {
+            _id: new ObjectId(query.id),
+        };
+        result = await collection.findOne(query2);
+
+        client.close();
+        console.log('result');
+        console.log(result);
+
+        return result;
+    }
+
+    async remove(query) {
+        const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
+        let result = '';
+
+        await client.connect();
+        const database = client.db(DB_NAME);
+        const collection = database.collection(this.collection);
+        const query2 = {
+            _id: new ObjectId(query.id),
+        };
+        result = await collection.deleteOne(query2);
+
+        client.close();
+        console.log('result');
+        console.log(result);
+
+        return result;
+    }
 }
 
 module.exports = MongoDB;
