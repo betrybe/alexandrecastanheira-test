@@ -3,34 +3,33 @@
  */
 // caso o banco mude, apenas o require vai ser alterado
 class CrudController {
-    constructor(model, database) {
+    constructor(model) {
         this.model = model;
-        this.database = database;
     }
 
-    insert(values) {
+    async insert(values) {
         console.log(`Realizando insert no mongodb da entidade: ${this.model.entityName}`);
-        // this.database.insert(this.model.entityName, values);
+        return this.model.insert(values);
     }
 
-    update(values, query) {
+    async update(values, query) {
         console.log(`Realizando update no mongodb da entidade: ${this.model.entityName}`);
-        // this.database.update(this.model.entityName, values, query);
+        return this.model.update(values, query);
     }
 
-    list(query) {
+    async list(query) {
         console.log(`Realizando list no mongodb da entidade: ${this.model.entityName}`);
-        // this.database.list(this.model.entityName, query);
+        return this.model.list(query);
     }
 
-    get(query) {
+    async get(query) {
         console.log(`Realizando get no mongodb da entidade: ${this.model.entityName}`);
-        // this.database.get(this.model.entityName, query);
+        return this.model.get(query);
     }
 
-    remove(query) {
+    async remove(query) {
         console.log(`Realizando get no mongodb da entidade: ${this.model.entityName}`);
-        // this.database.remove(this.model.entityName, query);
+        return this.model.remove(query);
     }
 }
 

@@ -1,7 +1,5 @@
 class ValidateService {
     constructor(model, data) {
-        console.log('constructor');
-        console.log(data);
         this.model = model;
         this.data = data;
 
@@ -13,7 +11,6 @@ class ValidateService {
     }
 
     required(data, field) {
-        console.log('printando o field');
         if (typeof data[field] === 'undefined') {
             this.result.valid = false;
             this.result.message = 'Invalid entries. Try again.';
@@ -35,14 +32,14 @@ class ValidateService {
         return true;
     }
 
-    unique(field, value) {
-        console.log(field);
-        console.log(value);
+    async unique(field, value) {
         const query = {
-            [this.field]: value,
+            [field.fieldName]: value,
         };
 
-        if (!this.model.list(query)) {
+        const existingDocuments = await this.model.count(query);
+
+        if (existingDocuments > 0) {
             this.result.valid = false;
             this.result.message = `${field.fieldName} already registred.`;
             this.result.status = 409;
@@ -50,6 +47,23 @@ class ValidateService {
         }
 
         return true;
+    }
+
+    async validLogin(email, password) {
+        if (email === '' || password === '') {
+            this.result.message = 'All fields must be filled.';
+            this.result.status = 401;
+        }
+
+        const query = {
+            email,
+            password,
+        }
+
+        const result = await this.model.get(query);
+        console.log('result: ');
+        console.log(result);
+        return this.result;
     }
 
     checkInsert() {
@@ -77,21 +91,6 @@ class ValidateService {
     }
 
     checkUpdate() {
-        this.model.fields.forEach(((field) => {
-            if (field.isRequired && !this.required(this.data, field.fieldName)) {
-                this.result.message = 'All fields must be filled';
-                this.result.valid = false;
-                return this.result;
-            }
-
-            field.validateFunctions.forEach((validateFunc) => {
-                if (validateFunc === 'emailValid') {
-                    this.emailValid(field, this.data[field.fieldName]);
-                    return this.result;
-                }
-            });
-        }));
-
         return this.result;
     }
 
@@ -100,6 +99,10 @@ class ValidateService {
     }
 
     checkRemove() {
+        return this.result;
+    }
+
+    checkGet() {
         return this.result;
     }
 }
