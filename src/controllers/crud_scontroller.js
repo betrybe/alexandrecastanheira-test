@@ -1,34 +1,62 @@
 /**
  * Controller responsável por requisições CRUD
  */
-// caso o banco mude, apenas o require vai ser alterado
-class CrudController {
+const Controller = require('./controller');
+
+class CrudController extends Controller {
     constructor(model) {
+        super();
         this.model = model;
     }
 
+    /**
+     * Realiza um insert na model vinculada ao controller.
+     *
+     * @param {Array} values
+     * @returns Object
+     */
     async insert(values) {
-        console.log(`Realizando insert no mongodb da entidade: ${this.model.entityName}`);
         return this.model.insert(values);
     }
 
+    /**
+     * Realiza um update na model vinculada ao controller.
+     *
+     * @param {Array} values
+     * @param {Array} query
+     * @returns Object
+     */
     async update(values, query) {
-        console.log(`Realizando update no mongodb da entidade: ${this.model.entityName}`);
         return this.model.update(values, query);
     }
 
+    /**
+     * Realiza a listagem da model vinculada ao controller.
+     *
+     * @param {Array} query
+     * @returns Array
+     */
     async list(query) {
-        console.log(`Realizando list no mongodb da entidade: ${this.model.entityName}`);
         return this.model.list(query);
     }
 
+    /**
+     * Obtem um registro da model vinculada ao controller.
+     *
+     * @param {Array} query
+     * @returns Object
+     */
     async get(query) {
-        console.log(`Realizando get no mongodb da entidade: ${this.model.entityName}`);
         return this.model.get(query);
     }
 
+    /**
+     * Remove um registro da model vinculada ao controller.
+     *
+     * @param {Array} query
+     * @returns Object
+     */
     async remove(query) {
-        console.log(`Realizando get no mongodb da entidade: ${this.model.entityName}`);
         return this.model.remove(query);
     }
 }

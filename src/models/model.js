@@ -30,7 +30,7 @@ class Model {
         return this.database.list(query);
     }
 
-    count(query) {
+    async count(query) {
         const msg = `Realizando count na entidade: ${this.entityName}`;
         console.log(msg);
         return this.database.count(query);
@@ -39,7 +39,13 @@ class Model {
     async get(query) {
         const msg = `Realizando get na entidade: ${this.entityName}`;
         console.log(msg);
-        return this.database.get(query);
+        return this.database.getByID(query);
+    }
+
+    async getByQuery(query) {
+        const msg = `Realizando get na entidade: ${this.entityName}`;
+        console.log(msg);
+        return this.database.getByQuery(query);
     }
 
     async remove(query) {

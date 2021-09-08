@@ -1,76 +1,46 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const multer = require('multer');
 const UserController = require('../controllers/user_controller');
 const RecipeController = require('../controllers/recipe_controller');
 const LoginController = require('../controllers/login_controller');
 
 const app = express();
+const upload = multer();
 
 // Não remover esse end-point, ele é necessário para o avaliador
 app.get('/', (request, response) => {
-  response.send();
+    response.send();
 });
 
-// eslint-disable-next-line max-lines-per-function
-app.post('/users', (request, response) => {
-    const controller = new UserController(request);
-    controller.insert().then((_val) => {
-        response.setHeader('Content-Type', 'application/json');
-        response.status(controller.status).send(controller.message);
-    });
-});
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/login', (request, response) => {
-    const controller = new LoginController(request);
-    controller.login();
-    response.setHeader('Content-Type', 'application/json');
-    response.status(controller.status).send(controller.message);
-    /*
-    controller.login().then((_val) => {
-        response.setHeader('Content-Type', 'application/json');
-        response.status(controller.status).send(controller.message);
-    });
-    */
-});
+app.post('/users', [
+    UserController.validateUserInsert,
+    UserController.insertRoute]);
 
-app.post('/recipes', (request, response) => {
-    const controller = new RecipeController(request);
-    controller.insert().then((_val) => {
-        response.setHeader('Content-Type', 'application/json');
-        response.status(controller.status).send(controller.message);
-    });
-});
+app.post('/login', [
+    LoginController.validateLoginFields,
+    LoginController.loginRoute]);
 
-app.get('/recipes', (request, response) => {
-    const controller = new RecipeController(request);
-    controller.list().then((_val) => {
-        response.setHeader('Content-Type', 'application/json');
-        response.status(controller.status).send(controller.message);
-    });
-});
+app.post('/recipes', [
+    RecipeController.validateRecipeInsert,
+    LoginController.authorize,
+    RecipeController.insertRoute]);
 
-app.get('/recipes/:id', (request, response) => {
-    const controller = new RecipeController(request);
-    controller.get().then((_val) => {
-        response.setHeader('Content-Type', 'application/json');
-        response.status(controller.status).send(controller.message);
-    });
-});
+app.get('/recipes', [
+    RecipeController.listRoute]);
 
-app.put('/recipes/:id', (request, response) => {
-    const controller = new RecipeController(request);
-    controller.update().then((_val) => {
-        response.setHeader('Content-Type', 'application/json');
-        response.status(controller.status).send(controller.message);
-    });
-});
+app.get('/recipes/:id', [
+    RecipeController.getOneRoute]);
 
-app.delete('/recipes/:id', (request, response) => {
-    const controller = new RecipeController(request);
-    controller.remove().then((_val) => {
-        response.setHeader('Content-Type', 'application/json');
-        response.status(controller.status).send(controller.message);
-    });
-});
+app.put('/recipes/:id', [
+    LoginController.authorize,
+    RecipeController.updateRoute]);
+
+app.delete('/recipes/:id', [
+    RecipeController.deleteRoute]);
 
 // Não remover esse end-point, ele é necessário para o avaliador
 module.exports = app;

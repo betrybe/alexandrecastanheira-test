@@ -23,6 +23,12 @@ const fields = [
         isRequired: true,
         validateFunctions: [],
     },
+    {
+        fieldName: 'userId',
+        fieldType: 'str',
+        isRequired: true,
+        validateFunctions: [],
+    },
 ]
 
 class Recipe extends Model {
