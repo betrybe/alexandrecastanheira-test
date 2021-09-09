@@ -66,11 +66,11 @@ class LoginController extends Controller {
      * @param {Object} next
      */
     static authorize(req, res, next) {
-        const token = req.headers.authorization.split(' ')[1];
-        if (!token) return res.status(401).json({ message: 'jwt malformed' });
+        const token = req.headers.authorization;
+        if (!token) return res.status(401).json({ message: 'missing auth token' });
 
         jwt.verifyAccessToken(token, (err, decoded) => {
-            if (err) return res.status(500).json({ message: 'Failed to authenticate token' });
+            if (err) return res.status(401).json({ message: 'jwt malformed' });
             req.body.userId = decoded.id;
         });
 

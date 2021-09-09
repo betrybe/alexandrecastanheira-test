@@ -40,6 +40,7 @@ app.put('/recipes/:id', [
     RecipeController.updateRoute]);
 
 app.delete('/recipes/:id', [
+    LoginController.authorize,
     RecipeController.deleteRoute]);
 
 // Não remover esse end-point, ele é necessário para o avaliador

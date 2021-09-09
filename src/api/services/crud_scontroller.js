@@ -26,8 +26,8 @@ class CrudController extends Controller {
      * @param {Array} query
      * @returns Object
      */
-    async update(values, query) {
-        return this.model.update(values, query);
+    async update(values, id) {
+        return this.model.update(values, id);
     }
 
     /**
@@ -46,8 +46,8 @@ class CrudController extends Controller {
      * @param {Array} query
      * @returns Object
      */
-    async get(query) {
-        return this.model.get(query);
+    async get(id) {
+        return this.model.get(id);
     }
 
     /**
@@ -56,8 +56,8 @@ class CrudController extends Controller {
      * @param {Array} query
      * @returns Object
      */
-    async remove(query) {
-        return this.model.remove(query);
+    async remove(id) {
+        return this.model.remove(id);
     }
 }
 

@@ -54,8 +54,8 @@ class User extends Model {
     /**
      * Sobrescrita para remover a senha do retorno.
      */
-    async update(values, query) {
-        const updatedOb = await super.update(values, query);
+    async update(values, id) {
+        const updatedOb = await super.update(values, id);
         delete updatedOb.password;
         return updatedOb;
     }

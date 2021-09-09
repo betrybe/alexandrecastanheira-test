@@ -136,8 +136,13 @@ class RecipeController extends CrudController {
 
         const query = this.body;
         await super.list(query).then((result) => {
-            this.message = JSON.stringify(result);
-            this.status = 200;
+            if (result) {
+                this.message = JSON.stringify(result);
+                this.status = 200;
+            } else {
+                this.message = JSON.stringify({ message: 'recipe not found' });
+                this.status = 404;
+            }
         });
     }
 
@@ -146,10 +151,14 @@ class RecipeController extends CrudController {
      * @returns boolean
      */
     async get() {
-        const query = this.params;
-        await super.get(query).then((result) => {
-            this.message = JSON.stringify(result);
-            this.status = 200;
+        await super.get(this.params.id).then((result) => {
+            if (result) {
+                this.message = JSON.stringify(result);
+                this.status = 200;
+            } else {
+                this.message = JSON.stringify({ message: 'recipe not found' });
+                this.status = 404;
+            }
         });
     }
 
@@ -159,8 +168,7 @@ class RecipeController extends CrudController {
      */
     async update() {
         const values = this.body;
-        const query = this.params;
-        const result = await super.update(values, query);
+        const result = await super.update(values, this.params.id);
         this.message = JSON.stringify({ recipe: result });
         this.status = 200;
         return result;
@@ -171,8 +179,7 @@ class RecipeController extends CrudController {
      * @returns boolean
      */
     async remove() {
-        const query = this.params;
-        await super.remove(query);
+        await super.remove(this.params.id);
     }
 }
 

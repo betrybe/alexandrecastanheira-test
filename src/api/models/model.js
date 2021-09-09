@@ -16,8 +16,8 @@ class Model {
         return this.database.insert(values);
     }
 
-    async update(values, query) {
-        return this.database.update(values, query);
+    async update(values, id) {
+        return this.database.update(values, id);
     }
 
     async list(query) {
@@ -28,16 +28,16 @@ class Model {
         return this.database.count(query);
     }
 
-    async get(query) {
-        return this.database.getByID(query);
+    async get(id) {
+        return this.database.getByID(id);
     }
 
     async getByQuery(query) {
         return this.database.getByQuery(query);
     }
 
-    async remove(query) {
-        return this.database.remove(query);
+    async remove(id) {
+        return this.database.remove(id);
     }
 }
 

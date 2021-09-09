@@ -23,6 +23,12 @@ class MongoDB {
         this.collection = collection;
     }
 
+    static getQueryByID(id) {
+        return {
+            _id: new ObjectId(id),
+        };
+    }
+
     /**
      * Insere um registro no mongodb.
      *
@@ -37,8 +43,9 @@ class MongoDB {
             const database = client.db(DB_NAME);
             const collection = database.collection(this.collection);
             const result = await collection.insertOne(data);
-            const query = { id: result.insertedId };
-            insertedOb = await this.getByID(query);
+            insertedOb = await this.getByID(result.insertedId);
+        } catch (error) {
+            console.log(error);
         } finally {
             await client.close();
         }
@@ -52,7 +59,7 @@ class MongoDB {
      * @param {Object} data - Dados atualizados
      * @returns Object
      */
-    async update(data, query) {
+    async update(data, id) {
         const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
         let updatedOb = '';
         try {
@@ -63,12 +70,12 @@ class MongoDB {
                 $set: data,
             };
 
-            const formatedQuery = {
-                _id: new ObjectId(query.id),
-            };
+            const query = MongoDB.getQueryByID(id);
 
-            await collection.updateOne(formatedQuery, setValues);
-            updatedOb = await this.getByID(formatedQuery);
+            await collection.updateOne(query, setValues);
+            updatedOb = await this.getByID(query);
+        } catch (error) {
+            console.log(error);
         } finally {
             await client.close();
         }
@@ -90,6 +97,8 @@ class MongoDB {
             const database = client.db(DB_NAME);
             const collection = database.collection(this.collection);
             result = await collection.find(query).toArray();
+        } catch (error) {
+            console.log(error);
         } finally {
             await client.close();
         }
@@ -103,7 +112,7 @@ class MongoDB {
      * @param {Object} data - Query para a busca por id formato mongodb.
      * @returns Object
      */
-    async getByID(query) {
+    async getByID(id) {
         const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
         let result = '';
 
@@ -111,10 +120,10 @@ class MongoDB {
             await client.connect();
             const database = client.db(DB_NAME);
             const collection = database.collection(this.collection);
-            const formatedQuery = {
-                _id: new ObjectId(query.id),
-            };
+            const formatedQuery = MongoDB.getQueryByID(id);
             result = await collection.findOne(formatedQuery);
+        } catch (error) {
+            console.log(error);
         } finally {
             client.close();
         }
@@ -137,6 +146,8 @@ class MongoDB {
             const database = client.db(DB_NAME);
             const collection = database.collection(this.collection);
             result = await collection.findOne(query);
+        } catch (error) {
+            console.log(error);
         } finally {
             client.close();
         }
@@ -159,6 +170,8 @@ class MongoDB {
             const database = client.db(DB_NAME);
             const collection = database.collection(this.collection);
             result = await collection.countDocuments(query);
+        } catch (error) {
+            console.log(error);
         } finally {
             client.close();
         }
@@ -172,7 +185,7 @@ class MongoDB {
      * @param {Object} data - Query para a busca por id formato mongodb.
      * @returns Object
      */
-    async remove(query) {
+    async remove(id) {
         const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
         let result = '';
 
@@ -180,10 +193,10 @@ class MongoDB {
             await client.connect();
             const database = client.db(DB_NAME);
             const collection = database.collection(this.collection);
-            const formatedQuery = {
-                _id: new ObjectId(query.id),
-            };
+            const formatedQuery = MongoDB.getQueryByID(id);
             result = await collection.deleteOne(formatedQuery);
+        } catch (error) {
+            console.log(error);
         } finally {
             client.close();
         }
