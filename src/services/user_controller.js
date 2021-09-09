@@ -3,7 +3,7 @@
  */
 const CrudController = require('./crud_scontroller');
 const ValidateService = require('../helpers/validate_helper');
-const UserModel = require('../models/user');
+const UserModel = require('../../models/user');
 
 const model = new UserModel();
 
@@ -65,7 +65,7 @@ class UserController extends CrudController {
     async insert() {
         const isUnique = await this.validate.unique('email', this.body.email);
         if (!isUnique) {
-            this.message = JSON.stringify({ message: 'Email already registred.' });
+            this.message = JSON.stringify({ message: 'Email already registered' });
             this.status = 409;
             return false;
         }

@@ -2,7 +2,7 @@
  * Controller responsável por tratar as requisições da entidade de receitas.
  */
 const CrudController = require('./crud_scontroller');
-const ValidateService = require('../helpers/validate_helper');
+const ValidateService = require('../../helpers/validate_helper');
 const RecipeModel = require('../models/recipe');
 
 const model = new RecipeModel();
@@ -31,12 +31,12 @@ class RecipeController extends CrudController {
      * @param {Object} next
      */
     static validateRecipeInsert(req, res, next) {
-        const ingredients = req.query.ingredients || '';
-        const name = req.query.name || '';
-        const preparation = req.query.preparation || '';
+        const ingredients = req.body.ingredients || '';
+        const name = req.body.name || '';
+        const preparation = req.body.preparation || '';
     
         if (!ingredients || !name || !preparation) {
-            return res.status(400).send({ message: 'All fields must be filled.' });
+            return res.status(400).send({ message: 'Invalid entries. Try again.' });
         }
     
         next();
@@ -49,7 +49,7 @@ class RecipeController extends CrudController {
      * @param {Object} response
      */
     static insertRoute(request, response) {
-        const authenticated = request.query.userId || '';
+        const authenticated = request.body.userId || '';
         if (authenticated) {
             const controller = new RecipeController(request);
             controller.insert().then((_val) => {
@@ -117,15 +117,8 @@ class RecipeController extends CrudController {
     async insert() {
         const values = this.body;
         const result = await super.insert(values);
-
-        if (result.ok && result.insertedCount === 1) {
-            this.message = `
-                ${this.model.entityName} com ID=${result.insertedId} foi inserido com sucesso.`;
-            return true;
-        }
-
         this.message = JSON.stringify({ recipe: result });
-        this.status = 200;
+        this.status = 201;
         return result;
     }
 
@@ -153,13 +146,6 @@ class RecipeController extends CrudController {
      * @returns boolean
      */
     async get() {
-        const validateResult = this.validate.checkGet(this.request.query);
-        if (!validateResult.valid) {
-            this.message = validateResult.message;
-            this.status = validateResult.status;
-            return false;
-        }
-
         const query = this.params;
         await super.get(query).then((result) => {
             this.message = JSON.stringify(result);
@@ -172,27 +158,12 @@ class RecipeController extends CrudController {
      * @returns boolean
      */
     async update() {
-        const validateResult = this.validate.checkUpdate();
-        if (!validateResult.valid) {
-            this.message = validateResult.message;
-            this.status = validateResult.status;
-            return false;
-        }
-
         const values = this.body;
         const query = this.params;
-        await super.update(values, query).then((result) => {
-            if (result.ok && result.updatedCount === 1) {
-                const jsonReturn = {
-                    message: 'Atualizado com sucesso.',
-                };
-
-                this.message = JSON.stringify(jsonReturn);
-                this.status = 200;
-            }
-        });
-
-        return true;
+        const result = await super.update(values, query);
+        this.message = JSON.stringify({ recipe: result });
+        this.status = 200;
+        return result;
     }
 
     /**
@@ -200,15 +171,8 @@ class RecipeController extends CrudController {
      * @returns boolean
      */
     async remove() {
-        const validateResult = this.validate.checkRemove(this.request.query);
-        if (!validateResult.valid) {
-            this.message = validateResult.message;
-            this.status = validateResult.status;
-            return false;
-        }
-
         const query = this.params;
-        super.remove(query);
+        await super.remove(query);
     }
 }
 

@@ -1,9 +1,9 @@
 /**
  * Controller responsável por tratar as requisições referentes ao login.
  */
-const ValidateService = require('../helpers/validate_helper');
+const ValidateService = require('../../helpers/validate_helper');
 const UserModel = require('../models/user');
-const JWTHelper = require('../helpers/jwt_helper');
+const JWTHelper = require('../../helpers/jwt_helper');
 const Controller = require('./controller');
 
 const jwt = new JWTHelper();
@@ -16,8 +16,8 @@ class LoginController extends Controller {
      */
     constructor(request) {
         super();
-        this.email = request.body.email || 'email padrao';
-        this.password = request.body.password || 'senha padrao';
+        this.email = request.body.email || '';
+        this.password = request.body.password || '';
         this.jwt = jwt;
         this.model = new UserModel();
         this.validate = new ValidateService(this.model, request);
@@ -35,10 +35,10 @@ class LoginController extends Controller {
         const password = req.body.password || '';
 
         if (!email || !password) {
-            return res.status(401).send({ message: 'Invalid entries. Try again.' });
+            return res.status(401).send({ message: 'All fields must be filled' });
         }
-        if (!ValidateService.emailValid(req.query.email)) {
-            return res.status(401).send({ message: 'Invalid entries. Try again.' });
+        if (!ValidateService.emailValid(email)) {
+            return res.status(401).send({ message: 'Incorrect username or password' });
         }
     
         next();
@@ -67,10 +67,10 @@ class LoginController extends Controller {
      */
     static authorize(req, res, next) {
         const token = req.headers.authorization.split(' ')[1];
-        if (!token) return res.status(401).json({ message: 'No token provided.' });
+        if (!token) return res.status(401).json({ message: 'jwt malformed' });
 
         jwt.verifyAccessToken(token, (err, decoded) => {
-            if (err) return res.status(500).json({ message: 'Failed to authenticate token.' });
+            if (err) return res.status(500).json({ message: 'Failed to authenticate token' });
             req.body.userId = decoded.id;
         });
 
@@ -96,13 +96,8 @@ class LoginController extends Controller {
             password: this.password,
         };
 
-        console.log('query');
-        console.log(query);
-
         await this.model.getByQuery(query).then((user) => {
-            if (!user) {
-                return false;
-            }
+            if (!user) return false;
 
             const userId = user['_id'] || '';
             const responseObject = {
@@ -110,7 +105,7 @@ class LoginController extends Controller {
             };
 
             this.message = JSON.stringify(responseObject);
-            this.status = 201;
+            this.status = 200;
             return true;
         });
 

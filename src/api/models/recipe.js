@@ -1,8 +1,8 @@
 /**
  * Model responsável por requisições CRUD
  */
-const MongoDB = require('../helpers/mongodb_helper');
-const Model = require('./model');
+ const MongoDB = require('../../helpers/mongodb_helper');
+ const Model = require('./model');
 
 const fields = [
     {
@@ -12,35 +12,32 @@ const fields = [
         validateFunctions: [],
     },
     {
-        fieldName: 'email',
-        fieldType: 'str',
-        isRequired: true,
-        validateFunctions: [
-            'emailValid',
-            'unique',
-        ],
-    },
-    {
-        fieldName: 'password',
+        fieldName: 'ingredients',
         fieldType: 'str',
         isRequired: true,
         validateFunctions: [],
     },
     {
-        fieldName: 'role',
+        fieldName: 'preparation',
         fieldType: 'str',
-        isRequired: false,
+        isRequired: true,
         validateFunctions: [],
     },
-];
+    {
+        fieldName: 'userId',
+        fieldType: 'str',
+        //isRequired: true,
+        validateFunctions: [],
+    },
+]
 
-class User extends Model {
+class Recipe extends Model {
     constructor() {
         super();
-        this.entityName = 'users';
+        this.entityName = 'recipes';
         this.setDatabase(new MongoDB(this.entityName));
         this.fields = fields;
     }
 }
 
-module.exports = User;
+ module.exports = Recipe;

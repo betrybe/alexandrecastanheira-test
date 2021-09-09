@@ -36,7 +36,7 @@ class ValidateService {
 
         const count = await this.model.count(query);
         if (count > 0) {
-            this.result.message = 'Email already registred.';
+            this.result.message = 'Email already registered';
             this.result.valid = false;
             this.result.status = 409;
             return false;
@@ -47,7 +47,7 @@ class ValidateService {
 
     loginFieldsRequired(email, password) {
         if (email === '' || password === '') {
-            this.result.message = 'All fields must be filled.';
+            this.result.message = 'All fields must be filled';
             this.result.status = 401;
             this.result.valid = false;
             return false;
@@ -64,7 +64,7 @@ class ValidateService {
 
         await this.model.getByQuery(query).then((result) => {
             if (result == null || typeof result['_id'] === 'undefined') {
-                this.result.message = 'Incorrect username or password.';
+                this.result.message = 'Incorrect username or password';
                 this.result.status = 401;
                 this.result.valid = false;
                 return false;

@@ -1,9 +1,8 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const multer = require('multer');
-const UserController = require('../controllers/user_controller');
-const RecipeController = require('../controllers/recipe_controller');
-const LoginController = require('../controllers/login_controller');
+const UserController = require('../api/services/user_controller');
+const RecipeController = require('../api/services/recipe_controller');
+const LoginController = require('../api/services/login_controller');
 
 const app = express();
 const upload = multer();
@@ -13,8 +12,9 @@ app.get('/', (request, response) => {
     response.send();
 });
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+
+// app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/users', [
     UserController.validateUserInsert,

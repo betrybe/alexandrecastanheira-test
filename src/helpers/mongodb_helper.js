@@ -54,7 +54,7 @@ class MongoDB {
      */
     async update(data, query) {
         const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
-        let result = '';
+        let updatedOb = '';
         try {
             await client.connect();
             const database = client.db(DB_NAME);
@@ -67,12 +67,13 @@ class MongoDB {
                 _id: new ObjectId(query.id),
             };
 
-            result = await collection.updateOne(formatedQuery, setValues);
+            await collection.updateOne(formatedQuery, setValues);
+            updatedOb = await this.getByID(formatedQuery);
         } finally {
             await client.close();
         }
 
-        return result;
+        return updatedOb;
     }
 
     /**
