@@ -70,7 +70,6 @@ class UserController extends CrudController {
             return false;
         }
 
-        this.body.role = 'user';
         const values = this.body;
         console.log('values');
         console.log(values);

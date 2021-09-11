@@ -2,8 +2,9 @@
  * Controller responsável por tratar as requisições da entidade de receitas.
  */
 const CrudController = require('./crud_scontroller');
-const ValidateService = require('../../helpers/validate_helper');
 const RecipeModel = require('../models/recipe');
+const UserController = require('./user_controller');
+const UserModel = require('../models/user');
 
 const model = new RecipeModel();
 
@@ -14,13 +15,7 @@ class RecipeController extends CrudController {
      * @param {Object} request 
      */
     constructor(request) {
-        super(model);
-        this.request = request.query;
-        this.params = request.params;
-        this.body = request.body;
-        this.message = '';
-        this.status = 200;
-        this.validate = new ValidateService(this.model, request);
+        super(request, model);
     }
 
     /**
@@ -98,6 +93,76 @@ class RecipeController extends CrudController {
     }
 
     /**
+     * Rota para alteração de registros.
+     *
+     * @param {Object} request
+     * @param {Object} response
+     */
+    static imageRoute(request, response) {
+        const filepath = `${request.headers.host}/src/uploads/${request.params.id}.jpeg`;
+        request.body.image = filepath;
+
+        const controller = new RecipeController(request);
+        controller.update().then((result) => {
+            controller.message = JSON.stringify(result);
+            controller.status = 200;
+            controller.sendResponse(response);
+        });
+    }
+
+    static getImageRoute(request, response) {
+        const {resolve} = require('path');
+        console.log('path absoluto');
+        const abPath = resolve('./uploads');
+        const filepath = `${abPath}/${request.params.id}.jpg`;
+        console.log(filepath);
+        response.status(200).sendFile(filepath);
+    }
+
+    async authImage() {
+        const recipe = await this.get();
+        if (!recipe) return false;
+
+        const user = await new UserModel().get(this.body.userId);
+        if (!user) return false;
+
+        const isImageOwner = recipe.userId === this.body.userId;
+        const isAdmin = user.role === 'admin';
+
+        return (isImageOwner || isAdmin);
+    }
+
+    /**
+     * Middleware para validar o token de autorização.
+     *
+     * @param {Object} request
+     * @param {Object} response
+     * @param {Object} next
+     */
+     static authorizeImage(request, response, next) {
+        const controller = new RecipeController(request);
+        controller.authImage(request).then((isValid) => {
+            console.log('chegou aqui');
+
+            if (!isValid) {
+                return response.status(401).json({ message: 'deu ruim na permissão' });
+            }
+
+            next();
+        });
+
+        /*
+        const token = req.headers.authorization;
+        if (!token) return res.status(401).json({ message: 'missing auth token' });
+
+        jwt.verifyAccessToken(token, (err, decoded) => {
+            if (err) return res.status(401).json({ message: 'jwt malformed' });
+            req.body.userId = decoded.id;
+        });
+        */
+    }
+
+    /**
      * Rota para remoção de registros.
      *
      * @param {Object} request
@@ -114,6 +179,7 @@ class RecipeController extends CrudController {
      * Processamento da operação de inserção.
      * @returns boolean
      */
+    /*
     async insert() {
         const values = this.body;
         const result = await super.insert(values);
@@ -121,6 +187,7 @@ class RecipeController extends CrudController {
         this.status = 201;
         return result;
     }
+    */
 
     /**
      * Processamento da operação de listagem.
@@ -150,6 +217,7 @@ class RecipeController extends CrudController {
      * Processamento da operação de obter um registro.
      * @returns boolean
      */
+    /*
     async get() {
         await super.get(this.params.id).then((result) => {
             if (result) {
@@ -161,11 +229,13 @@ class RecipeController extends CrudController {
             }
         });
     }
+    */
 
     /**
      * Processamento da operação de atualização.
      * @returns boolean
      */
+    /*
     async update() {
         const values = this.body;
         const result = await super.update(values, this.params.id);
@@ -173,14 +243,17 @@ class RecipeController extends CrudController {
         this.status = 200;
         return result;
     }
+    */
 
     /**
      * Processamento da operação de remoção.
      * @returns boolean
      */
+    /*
     async remove() {
         await super.remove(this.params.id);
     }
+    */
 }
 
 module.exports = RecipeController;

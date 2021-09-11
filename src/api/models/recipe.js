@@ -35,6 +35,7 @@ class Recipe extends Model {
     constructor() {
         super();
         this.entityName = 'recipes';
+        this.entitySingular = 'recipe';
         this.setDatabase(new MongoDB(this.entityName));
         this.fields = fields;
     }

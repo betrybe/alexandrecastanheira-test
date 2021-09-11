@@ -6,6 +6,11 @@ class Model {
     constructor() {
         this.database = false;
         this.entityName = '';
+        this.entitySingular = '';
+    }
+
+    getEntityName() {
+        return this.entityName;
     }
 
     setDatabase(database) {
@@ -29,6 +34,7 @@ class Model {
     }
 
     async get(id) {
+        console.log('veio no get da model.');
         return this.database.getByID(id);
     }
 

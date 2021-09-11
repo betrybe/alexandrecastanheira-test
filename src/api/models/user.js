@@ -38,6 +38,7 @@ class User extends Model {
     constructor() {
         super();
         this.entityName = 'users';
+        this.entitySingular = 'user';
         this.setDatabase(new MongoDB(this.entityName));
         this.fields = fields;
     }
@@ -47,7 +48,9 @@ class User extends Model {
      */
     async insert(values) {
         const insertedOb = await super.insert(values);
-        delete insertedOb.password;
+        if (insertedOb) {
+            delete insertedOb.password;
+        }
         return insertedOb;
     }
 

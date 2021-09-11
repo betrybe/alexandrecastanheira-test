@@ -14,12 +14,7 @@ class UserController extends CrudController {
      * @param {Object} request
      */
     constructor(request) {
-        super(model);
-        this.request = request.query;
-        this.body = request.body;
-        this.message = '';
-        this.status = 200;
-        this.validate = new ValidateService(this.model, this.request);
+        super(request, model);
     }
 
     /**
@@ -52,7 +47,22 @@ class UserController extends CrudController {
      */
      static insertRoute(request, response) {
         const controller = new UserController(request);
-        controller.insert().then((_val) => {
+        const defaultRole = 'user';
+        controller.insert(defaultRole).then((_val) => {
+            controller.sendResponse(response);
+        });
+    }
+
+    /**
+     * Rota para inserção de registros.
+     *
+     * @param {Object} request
+     * @param {Object} response
+     */
+     static insertAdminRoute(request, response) {
+        const controller = new UserController(request);
+        const defaultRole = 'admin';
+        controller.insert(defaultRole).then((_val) => {
             controller.sendResponse(response);
         });
     }
@@ -62,7 +72,7 @@ class UserController extends CrudController {
      *
      * @returns boolean
      */
-    async insert() {
+    async insert(defaultRole) {
         const isUnique = await this.validate.unique('email', this.body.email);
         if (!isUnique) {
             this.message = JSON.stringify({ message: 'Email already registered' });
@@ -70,10 +80,8 @@ class UserController extends CrudController {
             return false;
         }
 
-        this.body.role = 'user';
+        this.body.role = defaultRole;
         const values = this.body;
-        console.log('values');
-        console.log(values);
         const result = await super.insert(values);
         this.message = JSON.stringify({ user: result });
         this.status = 201;

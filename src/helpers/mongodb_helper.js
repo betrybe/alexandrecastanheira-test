@@ -60,6 +60,7 @@ class MongoDB {
      * @returns Object
      */
     async update(data, id) {
+        console.log('id do update: ' + id);
         const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
         let updatedOb = '';
         try {
@@ -71,9 +72,8 @@ class MongoDB {
             };
 
             const query = MongoDB.getQueryByID(id);
-
             await collection.updateOne(query, setValues);
-            updatedOb = await this.getByID(query);
+            updatedOb = await this.getByID(id);
         } catch (error) {
             console.log(error);
         } finally {
@@ -113,8 +113,13 @@ class MongoDB {
      * @returns Object
      */
     async getByID(id) {
+        console.log('id do get by id: ' + id);
         const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
         let result = '';
+
+        if (!id) {
+            return result;
+        }
 
         try {
             await client.connect();
@@ -188,6 +193,7 @@ class MongoDB {
     async remove(id) {
         const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
         let result = '';
+        console.log('id do remove: ' + id);
 
         try {
             await client.connect();

@@ -67,14 +67,35 @@ class LoginController extends Controller {
      */
     static authorize(req, res, next) {
         const token = req.headers.authorization;
+        console.log(token);
         if (!token) return res.status(401).json({ message: 'missing auth token' });
 
         jwt.verifyAccessToken(token, (err, decoded) => {
+            console.log(decoded);
             if (err) return res.status(401).json({ message: 'jwt malformed' });
             req.body.userId = decoded.id;
         });
 
         next();
+    }
+
+    /**
+     * Middleware para validar o token de autorização.
+     *
+     * @param {Object} request
+     * @param {Object} response
+     * @param {Object} next
+     */
+     static onlyAdmin(req, res, next) {
+        const model = new UserModel();
+        model.get(req.body.userId).then((user) => {
+            if (user.role !== 'admin') {
+                return res.status(403).json({ message: 'Only admins can register new admins' });
+            }
+
+            next();
+        });
+
     }
 
     /**
