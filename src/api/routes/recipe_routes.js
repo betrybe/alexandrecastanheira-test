@@ -1,11 +1,15 @@
+const path = require('path');
 const express = require('express');
 const multer = require('multer');
 const RecipeService = require('../services/recipe_service');
 const LoginService = require('../services/login_service');
 
+const uploadsPath = path.join(__dirname, '../..', 'uploads');
+console.log(uploadsPath);
+
 const storage = multer.diskStorage({
     destination(_req, _file, cb) {
-        cb(null, 'uploads/');
+        cb(null, uploadsPath);
     },
     filename(request, file, cb) {
         const extensaoArquivo = file.originalname.split('.')[1];
@@ -14,7 +18,7 @@ const storage = multer.diskStorage({
     },
 });
 
-const upload = multer({ dest: 'uploads/', storage });
+const upload = multer({ dest: uploadsPath, storage });
 const router = express.Router();
 
 router.post('/recipes', [
@@ -32,11 +36,6 @@ router.put('/recipes/:id/image', [
 router.get('/images/:id\.:jpeg', [
     RecipeService.getImageRoute,
 ]);
-/*
-router.get('/recipes/:id/image', [
-    RecipeService.getImageRoute,
-]);
-*/
 
 router.get('/recipes', [
     RecipeService.listRoute]);

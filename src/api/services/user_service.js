@@ -27,10 +27,11 @@ class UserService extends CrudService {
      * @returns void
      */
     static validateUserInsert(request, response, next) {
-        const email = request.body.email || '';
-        const name = request.body.name || '';
-        const password = request.body.password || '';
-        if (!email || !name || !password) {
+        try {
+            if (!request.body.email || !request.body.name || !request.body.password) {
+                return response.status(400).send({ message: 'Invalid entries. Try again.' });
+            }
+        } catch (error) {
             return response.status(400).send({ message: 'Invalid entries. Try again.' });
         }
 
@@ -46,6 +47,12 @@ class UserService extends CrudService {
         next();
     }
 
+    /**
+     * Middleware para validar se um determinado campo é único.
+     * @param {Object} request
+     * @param {Object} response
+     * @param {Object} next
+     */
     static validateUnique(request, response, next) {
         const service = new UserService(request);
         const uniqueField = 'email';

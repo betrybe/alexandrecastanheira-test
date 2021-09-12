@@ -84,20 +84,6 @@ class ValidateService {
         await this.loginCorrect(email, password).then((_res) => this.result);
         return this.result;
     }
-
-    /*
-    async checkInsert() {
-        this.model.fields.forEach(((field) => {
-            if (field.isRequired && !this.required(this.data, field.fieldName)) {
-                this.result.message = 'All fields must be filled';
-                this.result.valid = false;
-                return this.result;
-            }
-        }));
-
-        return this.result;
-    }
-    */
 }
 
 module.exports = ValidateService;

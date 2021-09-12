@@ -2,6 +2,7 @@
  * Service responsável por tratar as requisições da entidade de receitas.
  */
 const { resolve } = require('path');
+const multer = require('multer');
 const CrudService = require('./crud_service');
 const RecipeModel = require('../models/recipe');
 const UserModel = require('../models/user');
@@ -111,7 +112,7 @@ class RecipeService extends CrudService {
     }
 
     static getImageRoute(request, response) {
-        const abPath = resolve('./uploads');
+        const abPath = resolve('./src/uploads');
         const filepath = `${abPath}/${request.params.id}.jpg`;
         response.status(200).sendFile(filepath);
     }
@@ -146,6 +147,30 @@ class RecipeService extends CrudService {
             next();
         });
     }
+
+    /*
+    static uploadImageRoute(request, response, next) {
+        const storage = multer.diskStorage({
+            destination(_req, _file, cb) {
+                cb(null, 'uploads/');
+            },
+            filename(req, file, cb) {
+                const extensaoArquivo = file.originalname.split('.')[1];
+                const novoNomeArquivo = request.params.id;
+                cb(null, `${novoNomeArquivo}.${extensaoArquivo}`);
+            },
+        });
+
+        const upload = multer({ dest: './uploads/', storage });
+        try {
+            upload.single('image');
+        } catch (error) {
+            return response.status(500).json({ message: 'upload error' });
+        }
+
+        next();
+    }
+    */
 
     /**
      * Rota para remoção de registros.

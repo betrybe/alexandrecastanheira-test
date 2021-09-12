@@ -4,39 +4,12 @@
  const MongoDB = require('../../helpers/mongodb_helper');
  const Model = require('./model');
 
-const fields = [
-    {
-        fieldName: 'name',
-        fieldType: 'str',
-        isRequired: true,
-        validateFunctions: [],
-    },
-    {
-        fieldName: 'ingredients',
-        fieldType: 'str',
-        isRequired: true,
-        validateFunctions: [],
-    },
-    {
-        fieldName: 'preparation',
-        fieldType: 'str',
-        isRequired: true,
-        validateFunctions: [],
-    },
-    {
-        fieldName: 'userId',
-        fieldType: 'str',
-        validateFunctions: [],
-    },
-]
-
 class Recipe extends Model {
     constructor() {
         super();
         this.entityName = 'recipes';
         this.entitySingular = 'recipe';
         this.setDatabase(new MongoDB(this.entityName));
-        this.fields = fields;
     }
 }
 
