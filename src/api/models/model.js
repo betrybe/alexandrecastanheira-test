@@ -34,7 +34,6 @@ class Model {
     }
 
     async get(id) {
-        console.log('veio no get da model.');
         return this.database.getByID(id);
     }
 

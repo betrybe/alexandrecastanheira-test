@@ -1,24 +1,23 @@
 /**
- * Controller responsável por requisições CRUD
+ * Service responsável por requisições CRUD
  */
-const Controller = require('./controller');
+const Service = require('./service');
 const ValidateService = require('../../helpers/validate_helper');
 
-class CrudController extends Controller {
+class CrudService extends Service {
     constructor(request, model) {
         super();
-        this.request = request.query;
+        this.request = request;
+        this.query = request.query;
         this.body = request.body;
         this.params = request.params;
         this.model = model;
 
-        this.message = '';
-        this.status = 200;
-        this.validate = new ValidateService(this.model, this.request);
+        this.validate = new ValidateService(this.model, this.query);
     }
 
     /**
-     * Realiza um insert na model vinculada ao controller.
+     * Realiza um insert na model vinculada ao service.
      *
      * @param {Array} values
      * @returns Object
@@ -30,7 +29,6 @@ class CrudController extends Controller {
             this.message = JSON.stringify({ [this.model.entitySingular]: result });
             this.status = 201;
         } catch (error) {
-            console.log(error);
             this.message = JSON.stringify({ message: error });
             this.status = 500;
         }
@@ -38,7 +36,7 @@ class CrudController extends Controller {
     }
 
     /**
-     * Realiza um update na model vinculada ao controller.
+     * Realiza um update na model vinculada ao service.
      *
      * @param {Array} values
      * @param {Array} query
@@ -59,7 +57,7 @@ class CrudController extends Controller {
     }
 
     /**
-     * Realiza a listagem da model vinculada ao controller.
+     * Realiza a listagem da model vinculada ao service.
      *
      * @param {Array} query
      * @returns Array
@@ -69,7 +67,6 @@ class CrudController extends Controller {
         try {
             result = await this.model.list(query);
         } catch (error) {
-            console.log(error);
             this.message = JSON.stringify({ message: error });
             this.status = 500;
         }
@@ -78,19 +75,17 @@ class CrudController extends Controller {
     }
 
     /**
-     * Obtem um registro da model vinculada ao controller.
+     * Obtem um registro da model vinculada ao service.
      *
      * @param {Array} query
      * @returns Object
      */
     async get() {
-        console.log('veio no get do crud controller.');
-        console.log(this.params.id);
         let result = '';
         try {
             result = await this.model.get(this.params.id);
             if (!result) {
-                this.message = JSON.stringify({ message: "recipe not found" });
+                this.message = JSON.stringify({ message: `${this.model.entitySingular} not found` });
                 this.status = 404;
                 return result;
             }
@@ -99,7 +94,6 @@ class CrudController extends Controller {
             this.status = 200;
 
         } catch (error) {
-            console.log(error);
             this.message = JSON.stringify({ message: error });
             this.status = 500;
         }
@@ -108,7 +102,7 @@ class CrudController extends Controller {
     }
 
     /**
-     * Remove um registro da model vinculada ao controller.
+     * Remove um registro da model vinculada ao service.
      *
      * @param {Array} query
      * @returns Object
@@ -120,7 +114,6 @@ class CrudController extends Controller {
             this.message = JSON.stringify({ [this.model.entitySingular]: result });
             this.status = 204;
         } catch (error) {
-            console.log(error);
             this.message = JSON.stringify({ message: error });
             this.status = 500;
         }
@@ -129,4 +122,4 @@ class CrudController extends Controller {
     }
 }
 
-module.exports = CrudController;
+module.exports = CrudService;

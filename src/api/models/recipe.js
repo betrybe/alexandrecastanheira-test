@@ -26,7 +26,6 @@ const fields = [
     {
         fieldName: 'userId',
         fieldType: 'str',
-        //isRequired: true,
         validateFunctions: [],
     },
 ]

@@ -1,16 +1,16 @@
 /**
- * Controller responsável por tratar as requisições referentes ao login.
+ * Service responsável por tratar as requisições referentes ao login.
  */
 const ValidateService = require('../../helpers/validate_helper');
 const UserModel = require('../models/user');
 const JWTHelper = require('../../helpers/jwt_helper');
-const Controller = require('./controller');
+const Service = require('./service');
 
 const jwt = new JWTHelper();
 
-class LoginController extends Controller {
+class LoginService extends Service {
     /**
-     * Construtor do controller.
+     * Construtor do service.
      *
      * @param {Object} request
      */
@@ -30,9 +30,9 @@ class LoginController extends Controller {
      * @param {Object} response
      * @param {Object} next
      */
-    static validateLoginFields(req, res, next) {
-        const email = req.body.email || '';
-        const password = req.body.password || '';
+    static validateLoginFields(request, res, next) {
+        const email = request.body.email || '';
+        const password = request.body.password || '';
 
         if (!email || !password) {
             return res.status(401).send({ message: 'All fields must be filled' });
@@ -51,10 +51,9 @@ class LoginController extends Controller {
      * @param {Object} response
      */
     static loginRoute(request, response) {
-        const controller = new LoginController(request);
-        controller.login().then((_val) => {
-            response.setHeader('Content-Type', 'application/json');
-            controller.sendResponse(response, controller);
+        const service = new LoginService(request);
+        service.login().then((_val) => {
+            service.sendResponse(response);
         });
     }
 
@@ -65,15 +64,13 @@ class LoginController extends Controller {
      * @param {Object} response
      * @param {Object} next
      */
-    static authorize(req, res, next) {
-        const token = req.headers.authorization;
-        console.log(token);
+    static authorize(request, res, next) {
+        const token = request.headers.authorization;
         if (!token) return res.status(401).json({ message: 'missing auth token' });
 
         jwt.verifyAccessToken(token, (err, decoded) => {
-            console.log(decoded);
             if (err) return res.status(401).json({ message: 'jwt malformed' });
-            req.body.userId = decoded.id;
+            request.body.userId = decoded.id;
         });
 
         next();
@@ -86,9 +83,9 @@ class LoginController extends Controller {
      * @param {Object} response
      * @param {Object} next
      */
-     static onlyAdmin(req, res, next) {
+     static onlyAdmin(request, res, next) {
         const model = new UserModel();
-        model.get(req.body.userId).then((user) => {
+        model.get(request.body.userId).then((user) => {
             if (user.role !== 'admin') {
                 return res.status(403).json({ message: 'Only admins can register new admins' });
             }
@@ -134,4 +131,4 @@ class LoginController extends Controller {
     }
 }
 
-module.exports = LoginController;
+module.exports = LoginService;

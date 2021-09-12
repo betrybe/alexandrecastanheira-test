@@ -85,23 +85,7 @@ class ValidateService {
         return this.result;
     }
 
-    async validateFieldWithFunction(field, validateFunc) {
-        if (validateFunc === 'emailValid') {
-            if (!this.emailValid(this.data[field.fieldName])) {
-                return false;
-            }
-        }
-
-        if (validateFunc === 'unique') {
-            const isUnique = await this.unique(field, this.data[field.fieldName]);
-            if (!isUnique) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
+    /*
     async checkInsert() {
         this.model.fields.forEach(((field) => {
             if (field.isRequired && !this.required(this.data, field.fieldName)) {
@@ -109,32 +93,11 @@ class ValidateService {
                 this.result.valid = false;
                 return this.result;
             }
-
-            field.validateFunctions.forEach((validateFunc) => {
-                if (!this.validateFieldWithFunction(field, validateFunc)) {
-                    return this.result;
-                }
-            });
         }));
 
         return this.result;
     }
-
-    checkUpdate() {
-        return this.result;
-    }
-
-    checkList() {
-        return this.result;
-    }
-
-    checkRemove() {
-        return this.result;
-    }
-
-    checkGet() {
-        return this.result;
-    }
+    */
 }
 
 module.exports = ValidateService;

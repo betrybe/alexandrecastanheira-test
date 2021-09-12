@@ -10,8 +10,8 @@ const MONGO_DB_URL = 'mongodb://localhost:27017/Cookmaster';
 const DB_NAME = 'Cookmaster';
 
 // Dados Mongodb para avaliação.
-// const MONGO_DB_URL = 'mongodb://mongodb:27017/Cookmaster';
-// const DB_NAME = 'Cookmaster';
+//const MONGO_DB_URL = 'mongodb://mongodb:27017/Cookmaster';
+//const DB_NAME = 'Cookmaster';
 
 class MongoDB {
     /**
@@ -60,7 +60,6 @@ class MongoDB {
      * @returns Object
      */
     async update(data, id) {
-        console.log('id do update: ' + id);
         const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
         let updatedOb = '';
         try {
@@ -76,6 +75,7 @@ class MongoDB {
             updatedOb = await this.getByID(id);
         } catch (error) {
             console.log(error);
+
         } finally {
             await client.close();
         }
@@ -113,14 +113,10 @@ class MongoDB {
      * @returns Object
      */
     async getByID(id) {
-        console.log('id do get by id: ' + id);
         const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
         let result = '';
 
-        if (!id) {
-            return result;
-        }
-
+        if (!id) return result;
         try {
             await client.connect();
             const database = client.db(DB_NAME);
@@ -193,7 +189,6 @@ class MongoDB {
     async remove(id) {
         const client = new MongoClient(MONGO_DB_URL, { useUnifiedTopology: true });
         let result = '';
-        console.log('id do remove: ' + id);
 
         try {
             await client.connect();
