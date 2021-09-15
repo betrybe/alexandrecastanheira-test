@@ -66,10 +66,17 @@ class LoginService extends Service {
      */
     static authorize(request, res, next) {
         const token = request.headers.authorization;
-        if (!token) return res.status(401).json({ message: 'missing auth token' });
+        if (!token) {
+            console.log('faltou o token');
+            return res.status(401).json({ message: 'missing auth token' });
+        }
 
         jwt.verifyAccessToken(token, (err, decoded) => {
-            if (err) return res.status(401).json({ message: 'jwt malformed' });
+            if (err) {
+                console.log('deu erro');
+                return res.status(401).json({ message: 'jwt malformed' });
+            }
+
             request.body.userId = decoded.id;
         });
 

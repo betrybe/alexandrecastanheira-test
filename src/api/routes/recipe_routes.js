@@ -22,14 +22,14 @@ const upload = multer({ dest: uploadsPath, storage });
 const router = express.Router();
 
 router.post('/recipes', [
-    RecipeService.validateRecipeInsert,
     LoginService.authorize,
+    RecipeService.validateRecipeInsert,
     RecipeService.insertRoute]);
 
 router.put('/recipes/:id/image', [
+    upload.single('image'),
     LoginService.authorize,
     RecipeService.authorizeImage,
-    upload.single('image'),
     RecipeService.imageRoute,
 ]);
 

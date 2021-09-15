@@ -24,6 +24,10 @@ class MongoDB {
     }
 
     static getQueryByID(id) {
+        if (!ObjectId.isValid(id)) {
+            return false;
+        }
+
         return {
             _id: new ObjectId(id),
         };
@@ -53,6 +57,12 @@ class MongoDB {
         return insertedOb;
     }
 
+    static getSetValues(data) {
+        return {
+            $set: data,
+        };
+    }
+
     /**
      * Atualiza um registro no mongodb.
      *
@@ -66,13 +76,13 @@ class MongoDB {
             await client.connect();
             const database = client.db(DB_NAME);
             const collection = database.collection(this.collection);
-            const setValues = {
-                $set: data,
-            };
+            const setValues = MongoDB.getSetValues(data);
 
             const query = MongoDB.getQueryByID(id);
-            await collection.updateOne(query, setValues);
-            updatedOb = await this.getByID(id);
+            if (query) {
+                await collection.updateOne(query, setValues);
+                updatedOb = await this.getByID(id);
+            }
         } catch (error) {
             console.log(error);
 
@@ -122,7 +132,9 @@ class MongoDB {
             const database = client.db(DB_NAME);
             const collection = database.collection(this.collection);
             const formatedQuery = MongoDB.getQueryByID(id);
-            result = await collection.findOne(formatedQuery);
+            if (formatedQuery) {
+                result = await collection.findOne(formatedQuery);
+            }
         } catch (error) {
             console.log(error);
         } finally {
@@ -195,7 +207,9 @@ class MongoDB {
             const database = client.db(DB_NAME);
             const collection = database.collection(this.collection);
             const formatedQuery = MongoDB.getQueryByID(id);
-            result = await collection.deleteOne(formatedQuery);
+            if (formatedQuery) {
+                result = await collection.deleteOne(formatedQuery);
+            }
         } catch (error) {
             console.log(error);
         } finally {
