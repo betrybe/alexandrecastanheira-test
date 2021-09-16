@@ -21,6 +21,7 @@ router.post('/users/admin', [
 router.post('/login', [
     LoginService.validateLoginFields,
     UserService.validateEmail,
+    LoginService.validateLogin,
     LoginService.loginRoute]);
 
 module.exports = router;

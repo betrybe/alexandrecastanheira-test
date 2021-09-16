@@ -2,7 +2,6 @@
  * Service responsável por tratar as requisições da entidade de receitas.
  */
 const { resolve } = require('path');
-const multer = require('multer');
 const CrudService = require('./crud_service');
 const RecipeModel = require('../models/recipe');
 const UserModel = require('../models/user');
@@ -26,16 +25,42 @@ class RecipeService extends CrudService {
      * @param {Object} response
      * @param {Object} next
      */
-    static validateRecipeInsert(request, res, next) {
-        try {
-            if (!request.body.ingredients || !request.body.name || !request.body.preparation) {
-                return res.status(400).send({ message: 'Invalid entries. Try again.' });
-            }
-        } catch (error) {
-            return res.status(400).send({ message: 'Invalid entries. Try again.' });
+    static async validateRecipeInsert(request, res, next) {
+        if (!request.body.ingredients || !request.body.name || !request.body.preparation) {
+            const err = new Error();
+            err.httpStatusCode = 400;
+            err.message = 'Invalid entries. Try again.';
+            return next(err);
         }
 
         next();
+    }
+
+    /**
+     * Middleware para validar o token de autorização.
+     *
+     * @param {Object} request
+     * @param {Object} response
+     * @param {Object} next
+     */
+     static async authorizeImage(request, response, next) {
+        const service = new RecipeService(request);
+
+        const recipe = await service.get();
+        if (recipe) {
+            const user = await new UserModel().get(request.body.userId);
+            if (!user) return false;
+
+            const isImageOwner = recipe.userId === request.body.userId;
+            const isAdmin = user.role === 'admin';
+
+            if (isImageOwner || isAdmin) return next();
+        }
+
+        const err = new Error();
+        err.httpStatusCode = 401;
+        err.message = 'role not authorized';
+        return next(err);
     }
 
     /**
@@ -44,7 +69,7 @@ class RecipeService extends CrudService {
      * @param {Object} request
      * @param {Object} response
      */
-    static insertRoute(request, response) {
+    static async insertRoute(request, response) {
         const authenticated = request.body.userId || '';
         if (authenticated) {
             const service = new RecipeService(request);
@@ -60,10 +85,18 @@ class RecipeService extends CrudService {
      * @param {Object} request
      * @param {Object} response
      */
-    static listRoute(request, response) {
+    static async listRoute(request, response) {
         const service = new RecipeService(request);
-        service.list().then((_val) => {
-            service.sendResponse(response);
+        const query = request.body;
+        await service.list(query).then((result) => {
+            if (!result) {
+                const err = new Error();
+                err.httpStatusCode = 404;
+                err.message = 'recipe not found';
+                throw err;
+            }
+
+            return response.status(200).json(result);
         });
     }
 
@@ -73,7 +106,7 @@ class RecipeService extends CrudService {
      * @param {Object} request
      * @param {Object} response
      */
-    static getOneRoute(request, response) {
+    static async getOneRoute(request, response) {
         const service = new RecipeService(request);
         service.get().then((_val) => {
             service.sendResponse(response);
@@ -86,7 +119,7 @@ class RecipeService extends CrudService {
      * @param {Object} request
      * @param {Object} response
      */
-    static updateRoute(request, response) {
+    static async updateRoute(request, response) {
         const service = new RecipeService(request);
         service.update().then((_val) => {
             service.sendResponse(response);
@@ -99,7 +132,7 @@ class RecipeService extends CrudService {
      * @param {Object} request
      * @param {Object} response
      */
-    static imageRoute(request, response) {
+    static async imageRoute(request, response) {
         const filepath = `${request.headers.host}/src/uploads/${request.params.id}.jpeg`;
         request.body.image = filepath;
 
@@ -111,66 +144,11 @@ class RecipeService extends CrudService {
         });
     }
 
-    static getImageRoute(request, response) {
+    static async getImageRoute(request, response) {
         const abPath = resolve('./src/uploads');
         const filepath = `${abPath}/${request.params.id}.jpg`;
         response.status(200).sendFile(filepath);
     }
-
-    async authImage() {
-        const recipe = await this.get();
-        if (!recipe) return false;
-
-        const user = await new UserModel().get(this.body.userId);
-        if (!user) return false;
-
-        const isImageOwner = recipe.userId === this.body.userId;
-        const isAdmin = user.role === 'admin';
-
-        return (isImageOwner || isAdmin);
-    }
-
-    /**
-     * Middleware para validar o token de autorização.
-     *
-     * @param {Object} request
-     * @param {Object} response
-     * @param {Object} next
-     */
-     static authorizeImage(request, response, next) {
-        const service = new RecipeService(request);
-        service.authImage().then((isValid) => {
-            if (!isValid) {
-                return response.status(401).json({ message: 'role not authorized' });
-            }
-
-            next();
-        });
-    }
-
-    /*
-    static uploadImageRoute(request, response, next) {
-        const storage = multer.diskStorage({
-            destination(_req, _file, cb) {
-                cb(null, 'uploads/');
-            },
-            filename(req, file, cb) {
-                const extensaoArquivo = file.originalname.split('.')[1];
-                const novoNomeArquivo = request.params.id;
-                cb(null, `${novoNomeArquivo}.${extensaoArquivo}`);
-            },
-        });
-
-        const upload = multer({ dest: './uploads/', storage });
-        try {
-            upload.single('image');
-        } catch (error) {
-            return response.status(500).json({ message: 'upload error' });
-        }
-
-        next();
-    }
-    */
 
     /**
      * Rota para remoção de registros.
@@ -178,27 +156,10 @@ class RecipeService extends CrudService {
      * @param {Object} request
      * @param {Object} response
      */
-    static deleteRoute(request, response) {
+    static async deleteRoute(request, response) {
         const service = new RecipeService(request);
         service.remove().then((_val) => {
             service.sendResponse(response);
-        });
-    }
-
-    /**
-     * Processamento da operação de listagem.
-     * @returns boolean
-     */
-    async list() {
-        const query = this.body;
-        await super.list(query).then((result) => {
-            if (result) {
-                this.message = JSON.stringify(result);
-                this.status = 200;
-            } else {
-                this.message = JSON.stringify({ message: 'recipe not found' });
-                this.status = 404;
-            }
         });
     }
 }

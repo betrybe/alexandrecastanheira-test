@@ -17,17 +17,11 @@ app.get('/', (request, response) => {
     response.send();
 });
 
-app.use((err, req, res, _next) => {
-    res.status(err.status || 500);
-    res.send(err.message);
-});
-/*
 app.use((error, request, response, _next) => {
     response
         .status(error.httpStatusCode)
-        .json(JSON.pretify({ message: error.message }));
+        .json({ message: error.message });
 });
-*/
 
 /*
 app.get('/', (req, res, next) => {

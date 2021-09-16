@@ -5,7 +5,6 @@ const RecipeService = require('../services/recipe_service');
 const LoginService = require('../services/login_service');
 
 const uploadsPath = path.join(__dirname, '../..', 'uploads');
-console.log(uploadsPath);
 
 const storage = multer.diskStorage({
     destination(_req, _file, cb) {

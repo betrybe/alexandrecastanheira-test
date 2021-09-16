@@ -1,4 +1,4 @@
-class ValidateService {
+class ValidateHelper {
     constructor(model, data) {
         this.model = model;
         this.data = data;
@@ -10,17 +10,12 @@ class ValidateService {
         };
     }
 
-    required(data, field) {
-        if (typeof data[field] === 'undefined') {
-            this.result.valid = false;
-            this.result.message = 'Invalid entries. Try again.';
-            this.result.status = 400;
-            return false;
-        }
-
-        return true;
-    }
-
+    /**
+     * Verifica se um email está em um formato válido.
+     *
+     * @param {string} value
+     * @returns boolean
+     */
     static emailValid(value) {
         if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value)) {
             return false;
@@ -86,4 +81,4 @@ class ValidateService {
     }
 }
 
-module.exports = ValidateService;
+module.exports = ValidateHelper;

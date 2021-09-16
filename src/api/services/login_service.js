@@ -35,12 +35,12 @@ class LoginService extends Service {
         const password = request.body.password || '';
 
         if (!email || !password) {
-            return res.status(401).send({ message: 'All fields must be filled' });
+            const err = new Error();
+            err.httpStatusCode = 401;
+            err.message = 'All fields must be filled';
+            return next(err);
         }
-        if (!ValidateService.emailValid(email)) {
-            return res.status(401).send({ message: 'Incorrect username or password' });
-        }
-    
+
         next();
     }
 
@@ -67,14 +67,18 @@ class LoginService extends Service {
     static authorize(request, res, next) {
         const token = request.headers.authorization;
         if (!token) {
-            console.log('faltou o token');
-            return res.status(401).json({ message: 'missing auth token' });
+            const err = new Error();
+            err.httpStatusCode = 401;
+            err.message = 'missing auth token';
+            return next(err);
         }
 
-        jwt.verifyAccessToken(token, (err, decoded) => {
-            if (err) {
-                console.log('deu erro');
-                return res.status(401).json({ message: 'jwt malformed' });
+        jwt.verifyAccessToken(token, (error, decoded) => {
+            if (error) {
+                const err = new Error();
+                err.httpStatusCode = 401;
+                err.message = 'jwt malformed';
+                return next(err);
             }
 
             request.body.userId = decoded.id;
@@ -90,16 +94,43 @@ class LoginService extends Service {
      * @param {Object} response
      * @param {Object} next
      */
-     static onlyAdmin(request, res, next) {
+     static onlyAdmin(request, response, next) {
         const model = new UserModel();
         model.get(request.body.userId).then((user) => {
             if (user.role !== 'admin') {
-                return res.status(403).json({ message: 'Only admins can register new admins' });
+                const err = new Error();
+                err.httpStatusCode = 403;
+                err.message = 'Only admins can register new admins';
+                return next(err);
             }
 
             next();
         });
+    }
 
+    /**
+     * Middleware para verificar se o login é válido.
+     *
+     * @param {Object} request
+     * @param {Object} response
+     * @param {Object} next
+     */
+    static validateLogin(request, response, next) {
+        const email = request.body.email || '';
+        const password = request.body.password || '';
+
+        const validate = new ValidateService(new UserModel(), request);
+
+        validate.validLogin(email, password).then((result) => {
+            if (!result.valid) {
+                const err = new Error();
+                err.httpStatusCode = result.status;
+                err.message = result.message;
+                return next(err);
+            }
+
+            next();
+        });
     }
 
     /**
@@ -108,14 +139,6 @@ class LoginService extends Service {
      * @returns Boolean
      */
     async login() {
-        await this.validate.validLogin(this.email, this.password).then((validateResult) => {
-            if (!validateResult.valid) {
-                this.message = JSON.stringify({message: validateResult.message});
-                this.status = validateResult.status;
-                return false;
-            }
-        });
-
         const query = {
             email: this.email,
             password: this.password,
