@@ -49,7 +49,7 @@ class MongoDB {
             const result = await collection.insertOne(data);
             insertedOb = await this.getByID(result.insertedId);
         } catch (error) {
-            console.log(error);
+            console.err(error);
         } finally {
             await client.close();
         }
@@ -84,7 +84,7 @@ class MongoDB {
                 updatedOb = await this.getByID(id);
             }
         } catch (error) {
-            console.log(error);
+            console.err(error);
 
         } finally {
             await client.close();
@@ -108,7 +108,7 @@ class MongoDB {
             const collection = database.collection(this.collection);
             result = await collection.find(query).toArray();
         } catch (error) {
-            console.log(error);
+            console.err(error);
         } finally {
             await client.close();
         }
@@ -136,7 +136,7 @@ class MongoDB {
                 result = await collection.findOne(formatedQuery);
             }
         } catch (error) {
-            console.log(error);
+            console.err(error);
         } finally {
             client.close();
         }
@@ -160,7 +160,7 @@ class MongoDB {
             const collection = database.collection(this.collection);
             result = await collection.findOne(query);
         } catch (error) {
-            console.log(error);
+            console.err(error);
         } finally {
             client.close();
         }
@@ -184,7 +184,7 @@ class MongoDB {
             const collection = database.collection(this.collection);
             result = await collection.countDocuments(query);
         } catch (error) {
-            console.log(error);
+            console.err(error);
         } finally {
             client.close();
         }
@@ -211,7 +211,7 @@ class MongoDB {
                 result = await collection.deleteOne(formatedQuery);
             }
         } catch (error) {
-            console.log(error);
+            console.err(error);
         } finally {
             client.close();
         }

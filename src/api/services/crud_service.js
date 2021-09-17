@@ -1,10 +1,16 @@
 /**
- * Service responsável por requisições CRUD
+ * Service abstrato responsável por requisições CRUD
  */
 const Service = require('./service');
 const ValidateService = require('../../helpers/validate_helper');
 
 class CrudService extends Service {
+    /**
+     * Construtor do service.
+     *
+     * @param {Object} request
+     * @param {Object} model
+     */
     constructor(request, model) {
         super();
         this.request = request;

@@ -1,9 +1,9 @@
 const path = require('path');
 const express = require('express');
-
-const app = express();
 const userRoutes = require('./routes/user_routes');
 const recipeRoutes = require('./routes/recipe_routes');
+
+const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -17,25 +17,12 @@ app.get('/', (request, response) => {
     response.send();
 });
 
+// Tratamento de erros.
 app.use((error, request, response, _next) => {
     response
         .status(error.httpStatusCode)
         .json({ message: error.message });
 });
-
-/*
-app.get('/', (req, res, next) => {
-  // do some sync stuff
-  queryDb()
-    .then((data) => makeCsv(data)) // handle data
-    .then((csv) => })
-    .catch(next)
-})
-
-app.use((err, req, res, next) => {
-  // handle error
-})
-*/
 
 // Não remover esse end-point, ele é necessário para o avaliador
 module.exports = app;

@@ -30,7 +30,7 @@ class LoginService extends Service {
      * @param {Object} response
      * @param {Object} next
      */
-    static validateLoginFields(request, res, next) {
+    static validateLoginFields(request, _response, next) {
         const email = request.body.email || '';
         const password = request.body.password || '';
 

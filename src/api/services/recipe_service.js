@@ -25,7 +25,7 @@ class RecipeService extends CrudService {
      * @param {Object} response
      * @param {Object} next
      */
-    static async validateRecipeInsert(request, res, next) {
+    static async validateRecipeInsert(request, _response, next) {
         if (!request.body.ingredients || !request.body.name || !request.body.preparation) {
             const err = new Error();
             err.httpStatusCode = 400;
